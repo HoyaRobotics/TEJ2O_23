@@ -49,6 +49,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driver.rightBumper().onTrue(new MoveArm(arm));
+    driver.rightBumper().onFalse(null);
   }
 
   /**

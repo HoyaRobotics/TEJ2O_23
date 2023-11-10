@@ -19,13 +19,19 @@ public class MoveArm extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arm.setIntake8AnglePID(11);
+    this.arm.setArmAnglePID(0);
   }
+
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+  arm.armSpeed(0.3, 0.3);
 
+  if(arm.armInPosition(8)){
+    arm.armSpeed(0.0, 0.0);
+  }
+  }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}
@@ -33,6 +39,12 @@ public class MoveArm extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if(arm.armInPosition(11)){
+      return true;
+    }
+   else{
+    return false; 
+  }
   }
 }
+

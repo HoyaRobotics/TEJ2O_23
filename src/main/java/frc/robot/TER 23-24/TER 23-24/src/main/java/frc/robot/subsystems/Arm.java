@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -12,13 +14,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-  CANSparkMax armLeft;
-  CANSparkMax armRight;
+  CANSparkMax armLeft = new CANSparkMax(15, MotorType.kBrushless);
+  SparkMaxPIDController leftArmPID;
+  CANSparkMax armRight = new CANSparkMax(14, MotorType.kBrushless);
+  SparkMaxPIDController rightArmPID;
   /** Creates a new Arm. */
   public Arm() {
   
-    this.armLeft = new CANSparkMax(15, MotorType.kBrushless);
-    this.armLeft.restoreFactoryDefaults();
+  
+
+
+    armLeft.restoreFactoryDefaults();
     //^^This line was not working, it was because you were using an outdated REV library for your code
     //And so the method it was trying to run did not exist in the library it was looking through
     armLeft.setIdleMode(IdleMode.kCoast);
@@ -28,15 +34,23 @@ public class Arm extends SubsystemBase {
     armLeft.setOpenLoopRampRate(0.1);
     armLeft.setClosedLoopRampRate(0.1);
     armLeft.getEncoder().setPosition(0);
-    this.armRight = new CANSparkMax(14, MotorType.kBrushless);
-  armRight.restoreFactoryDefaults();
+
+    leftArmPID = armLeft.getPIDController();
+    leftArmPID.setP(0.05);
+
+    armRight.restoreFactoryDefaults();
     armRight.setIdleMode(IdleMode.kCoast);
     armRight.setSmartCurrentLimit(30);
-    armRight.setInverted(true);
+    armRight.setInverted(false);
     armRight.enableVoltageCompensation(10);
     armRight.setOpenLoopRampRate(0.1);
     armRight.setClosedLoopRampRate(0.1);
     armRight.getEncoder().setPosition(0);
+
+    rightArmPID = armRight.getPIDController();
+    rightArmPID.setP(0.05);
+
+
   }
 
   @Override
@@ -55,6 +69,20 @@ public class Arm extends SubsystemBase {
     armLeft.stopMotor();
     armRight.stopMotor();
   }
+  public void setArmAnglePID(double angle) {
+  leftArmPID.setReference(angle, CANSparkMax.ControlType.kPosition);
+  rightArmPID.setReference(angle, CANSparkMax.ControlType.kPosition);
+
+  }
+
+  public boolean armInPosition(double armAngle){
+    if(armAngle <= armLeft.getEncoder().getPosition()+1 || armAngle >= armLeft.getEncoder().getPosition()-1){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public double getIntakeEncoder() {
     return armLeft.getEncoder().getPosition();
   }
