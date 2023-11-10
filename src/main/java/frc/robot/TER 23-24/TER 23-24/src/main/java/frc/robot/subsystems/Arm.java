@@ -4,11 +4,10 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxPIDController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,9 +27,9 @@ public class Arm extends SubsystemBase {
     //^^This line was not working, it was because you were using an outdated REV library for your code
     //And so the method it was trying to run did not exist in the library it was looking through
     armLeft.setIdleMode(IdleMode.kCoast);
-    armLeft.setSmartCurrentLimit(30);
+    armLeft.setSmartCurrentLimit(35);
     armLeft.setInverted(true);
-    armLeft.enableVoltageCompensation(10);
+    armLeft.enableVoltageCompensation(10.5);
     armLeft.setOpenLoopRampRate(0.1);
     armLeft.setClosedLoopRampRate(0.1);
     armLeft.getEncoder().setPosition(0);
@@ -40,9 +39,9 @@ public class Arm extends SubsystemBase {
 
     armRight.restoreFactoryDefaults();
     armRight.setIdleMode(IdleMode.kCoast);
-    armRight.setSmartCurrentLimit(30);
+    armRight.setSmartCurrentLimit(35);
     armRight.setInverted(false);
-    armRight.enableVoltageCompensation(10);
+    armRight.enableVoltageCompensation(10.5);
     armRight.setOpenLoopRampRate(0.1);
     armRight.setClosedLoopRampRate(0.1);
     armRight.getEncoder().setPosition(0);
@@ -58,6 +57,7 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("IntakeEncoder", getIntakeEncoder());
 
+
     //Rest postiion is 0
     //Extended position is 11
   }
@@ -70,8 +70,8 @@ public class Arm extends SubsystemBase {
     armRight.stopMotor();
   }
   public void setArmAnglePID(double angle) {
-  leftArmPID.setReference(angle, CANSparkMax.ControlType.kPosition);
-  rightArmPID.setReference(angle, CANSparkMax.ControlType.kPosition);
+  leftArmPID.setReference(angle, CANSparkMax.ControlType.kPosition, 0);
+  rightArmPID.setReference(angle, CANSparkMax.ControlType.kPosition, 0);
 
   }
 
@@ -85,5 +85,19 @@ public class Arm extends SubsystemBase {
 
   public double getIntakeEncoder() {
     return armLeft.getEncoder().getPosition();
+  }
+
+public boolean isArmInPosition(double position) {
+  if(position <= armLeft.getEncoder().getPosition()+1 && position >= armLeft.getEncoder().getPosition()-1) {
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  public void setP(double newP){
+    leftArmPID.setP(newP);
+    rightArmPID.setP(newP);
+
   }
 }

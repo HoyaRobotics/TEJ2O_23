@@ -9,6 +9,7 @@ import frc.robot.commands.*; // added based on ZamZam's programing textbook
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -24,7 +25,7 @@ public class RobotContainer {
   private final DriveTrain driveTrain = new DriveTrain();
   private final Arm arm = new Arm ();
   //private final Arm arm = new Arm();
-  //private final Intake intake = new Intake();
+  private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driver =
@@ -48,8 +49,13 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driver.rightBumper().onTrue(new MoveArm(arm));
-    driver.rightBumper().onFalse(null);
+    driver.rightBumper().onTrue(new MoveArm(arm, 10, 0.05, true));
+    driver.rightBumper().onFalse(new MoveArm(arm, 0, 0.05, false));
+    driver.leftBumper().whileTrue(new RunIntake(intake, 0.25));
+    driver.leftBumper().onFalse(new RunIntake(intake, 0.0));
+
+    driver.x().whileTrue(new Shoot(intake, -0.4));
+    driver.x().onFalse(new Shoot(intake, 0.0));
   }
 
   /**
